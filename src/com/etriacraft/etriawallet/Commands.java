@@ -33,16 +33,16 @@ public class Commands {
 				}
 				else if (args[0].equalsIgnoreCase("balance") && s.hasPermission("etriawallet.balance")) {
 					if (args.length == 1) {
-					ResultSet rs2 = DBConnection.query("SELECT balance FROM wallet_players WHERE player = '" + s.getName() + "';", false);
-					try {
-						while (rs2.next()) {
-							s.sendMessage("§eYou currently have a balance of §a$" + rs2.getDouble("balance") + ".");
+						ResultSet rs2 = DBConnection.query("SELECT balance FROM wallet_players WHERE player = '" + s.getName() + "';", false);
+						try {
+							while (rs2.next()) {
+								s.sendMessage("§eYou currently have a balance of §a$" + rs2.getDouble("balance") + ".");
+							}
+						} catch (SQLException e) {
+							s.sendMessage("§cWas unable to check the balance. Perhaps you don't have a wallet yet.");
+							s.sendMessage("§eUse §3/wallet create §eto create a wallet for yourself.");
+							e.printStackTrace();
 						}
-					} catch (SQLException e) {
-						s.sendMessage("§cWas unable to check the balance. Perhaps you don't have a wallet yet.");
-						s.sendMessage("§eUse §3/wallet create §eto create a wallet for yourself.");
-						e.printStackTrace();
-					}
 					} else if (args.length == 2 && s.hasPermission("etriawallet.balance.others")) {
 						ResultSet rs2 = DBConnection.query("SELECT balance FROM wallet_players WHERE player = '" + args[1] + "';", false);
 						try {
