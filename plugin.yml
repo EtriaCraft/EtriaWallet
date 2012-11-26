@@ -5,10 +5,3 @@ commands:
   wallet:
     usage: /<command>
     aliases: [etriawallet, ew]
-permissions:
-  etriawallet.create
-    description: Allows the player to create a wallet for themselves.
-    default: op
-  etriawallet.balance
-    description: Allows the player to check their own balance.
-    default: op
