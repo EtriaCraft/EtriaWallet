@@ -100,9 +100,24 @@ public class Commands {
 					String purchasedPack = args[1];
 					Double price = plugin.getConfig().getDouble("packages." + purchasedPack + ".price");
 					String player = s.getName();
-					Double newbalance = null;
 					ResultSet playerBalance1 = DBConnection.query("SELECT balance FROM wallet_players WHERE player = '" + s.getName() + "';", false);
-					// Will finish filling this out later :p. Progress is being made!
+					try {
+
+						while (playerBalance1.next()) {
+
+							Double newbalance = playerBalance1.getDouble("balance");
+
+							if (!(newbalance > price)) {
+								s.sendMessage("§cYou don't have enough for this package");
+							} else {
+								s.sendMessage("§aProcess Payment Here...");
+							}
+						}
+					} catch (SQLException e) {
+						e.printStackTrace();
+
+					} 
+
 				} else {
 					s.sendMessage("Something went wrong");
 				} return true;
