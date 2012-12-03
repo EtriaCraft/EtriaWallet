@@ -5,3 +5,6 @@ commands:
   wallet:
     usage: /<command>
     aliases: [etriawallet, ew]
+  packs:
+    usage: /<command>
+    aliases: [packages, premiums]

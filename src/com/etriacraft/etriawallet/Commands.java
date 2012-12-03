@@ -19,6 +19,7 @@ public class Commands {
 
 	private void init() {
 		PluginCommand wallet = plugin.getCommand("wallet");
+		PluginCommand packs = plugin.getCommand("packs");
 		CommandExecutor exe;
 
 		exe = new CommandExecutor() {
@@ -73,6 +74,27 @@ public class Commands {
 				} return true;
 			}
 		}; wallet.setExecutor(exe);
-	}
+		exe = new CommandExecutor() {
+			@Override
+			public boolean onCommand(CommandSender s, Command c, String label, String[] args) {
+				if (args.length < 1) {
+					s.sendMessage("§eApplicable Pack Commands");
+					s.sendMessage("§3/packs info <name>§f - Returns information on a pack.");
+					return true;
+				} else if (args[0].equalsIgnoreCase("info") && s.hasPermission("etriawallet.packs.info")) {
+					String pack = args[1];
+					String price = plugin.getConfig().getString("packages." + pack + ".price");
+					String description = plugin.getConfig().getString("packages." + pack + ".description");
+					s.sendMessage("-----§e" + pack + " Info§f----- ");
+					s.sendMessage("§aPackage Name:§3 " + pack);
+					s.sendMessage("§aPrice:§3 " + price);
+					s.sendMessage("§aDescription:§3 " + description);
+					return true;
+				} else {
+					s.sendMessage("Something went wrong");
+				} return true;
+			}
+		}; packs.setExecutor(exe);
+	} 
 
 }

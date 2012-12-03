@@ -11,17 +11,17 @@ public final class DBConnection {
     
 	public static MySQLConnection con;
 	
-	public static String host;
-	public static int port;
-	public static String db;
-	public static String user;
-	public static String pass;
+	public static EtriaWallet plugin;
+	
+	public DBConnection(EtriaWallet instance) {
+		plugin = instance;
+	}
     
     public static void init() {
     	EtriaWallet.log.info("[EtriaWallet] Etablishing Database Connection...");
     	
     	try {
-    		con = new MySQLConnection(host, port, db, user, pass);
+    		con = new MySQLConnection(plugin.getConfig().getString("MySQL.host"), plugin.getConfig().getInt("MySQL.port"), plugin.getConfig().getString("MySQL.database"), plugin.getConfig().getString("MySQL.username"), plugin.getConfig().getString("MySQL.password"));
     	} catch (InstantiationException e) {
     		e.printStackTrace();
     	} catch (IllegalAccessException e) {

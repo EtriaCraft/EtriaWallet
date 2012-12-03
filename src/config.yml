@@ -4,3 +4,11 @@ MySQL:
   username: root
   password: pass
   database: minecraft
+packages:
+  VIP1:
+    price: '5.00'
+    expires: '0'
+    commands:
+    - world world
+    - user %player
+    - user setgroup VIP1
