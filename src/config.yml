@@ -7,7 +7,7 @@ MySQL:
 packages:
   VIP1:
     price: '5.00'
-    expires: '0'
+	description: This gives you the VIP 1 Package.
     commands:
     - world world
     - user %player

@@ -40,6 +40,11 @@ public class EtriaWallet extends JavaPlugin {
 		config = new YamlConfiguration();
 		loadYamls();
 		
+		DBConnection.host = config.getString("MySQL.host", "localhost");
+		DBConnection.db = config.getString("MySQL.database", "minecraft");
+		DBConnection.user = config.getString("MySQL.username", "root");
+		DBConnection.pass = config.getString("MySQL.password", "");
+		DBConnection.port = config.getInt("MySQL.port", 3306);
 		
 		DBConnection.init();
 		

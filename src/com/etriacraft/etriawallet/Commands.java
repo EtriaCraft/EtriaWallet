@@ -7,6 +7,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Player;
 
 public class Commands {
 
@@ -84,12 +85,24 @@ public class Commands {
 				} else if (args[0].equalsIgnoreCase("info") && s.hasPermission("etriawallet.packs.info")) {
 					String pack = args[1];
 					String price = plugin.getConfig().getString("packages." + pack + ".price");
-					String description = plugin.getConfig().getString("packages." + pack + ".description");
-					s.sendMessage("-----§e" + pack + " Info§f----- ");
-					s.sendMessage("§aPackage Name:§3 " + pack);
-					s.sendMessage("§aPrice:§3 " + price);
-					s.sendMessage("§aDescription:§3 " + description);
-					return true;
+					if (price == null) {
+						s.sendMessage("§cWas not able to pull the required information for this package.");
+						s.sendMessage("§cPerhaps it doesn't exist?");
+					} else {
+						String description = plugin.getConfig().getString("packages." + pack + ".description");
+						s.sendMessage("-----§e" + pack + " Info§f----- ");
+						s.sendMessage("§aPackage Name:§3 " + pack);
+						s.sendMessage("§aPrice:§3 " + price);
+						s.sendMessage("§aDescription:§3 " + description);
+						return true;
+					}
+				} else if (args[0].equalsIgnoreCase("buy") && s.hasPermission("etriawallet.packs.buy")) {
+					String purchasedPack = args[1];
+					Double price = plugin.getConfig().getDouble("packages." + purchasedPack + ".price");
+					String player = s.getName();
+					Double newbalance = null;
+					ResultSet playerBalance1 = DBConnection.query("SELECT balance FROM wallet_players WHERE player = '" + s.getName() + "';", false);
+					// Will finish filling this out later :p. Progress is being made!
 				} else {
 					s.sendMessage("Something went wrong");
 				} return true;
