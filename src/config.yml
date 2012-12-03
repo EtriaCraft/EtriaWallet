@@ -6,7 +6,7 @@ MySQL:
   database: minecraft
 packages:
   VIP1:
-    price: '5.00'
+    price: 5.00
 	description: This gives you the VIP 1 Package.
     commands:
     - world world

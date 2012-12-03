@@ -2,6 +2,7 @@ package com.etriacraft.etriawallet;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -84,7 +85,7 @@ public class Commands {
 					return true;
 				} else if (args[0].equalsIgnoreCase("info") && s.hasPermission("etriawallet.packs.info")) {
 					String pack = args[1];
-					String price = plugin.getConfig().getString("packages." + pack + ".price");
+					Double price = plugin.getConfig().getDouble("packages." + pack + ".price");
 					if (price == null) {
 						s.sendMessage("§cWas not able to pull the required information for this package.");
 						s.sendMessage("§cPerhaps it doesn't exist?");
@@ -101,22 +102,34 @@ public class Commands {
 					Double price = plugin.getConfig().getDouble("packages." + purchasedPack + ".price");
 					String player = s.getName();
 					ResultSet playerBalance1 = DBConnection.query("SELECT balance FROM wallet_players WHERE player = '" + s.getName() + "';", false);
-					try {
+					if (price == null) {
+						s.sendMessage("§cThere is an error with that package.");
+						s.sendMessage("§cIt either doesn't exist or the price is not valid.");
+					} else {
+						try {
 
-						while (playerBalance1.next()) {
+							while (playerBalance1.next()) {
 
-							Double newbalance = playerBalance1.getDouble("balance");
+								Double newbalance = playerBalance1.getDouble("balance");
 
-							if (!(newbalance > price)) {
-								s.sendMessage("§cYou don't have enough for this package");
-							} else {
-								s.sendMessage("§aProcess Payment Here...");
+								if (!(newbalance >= price)) {
+									s.sendMessage("§cYou don't have enough for this package");
+								} else if (newbalance >= price) {
+									DBConnection.query("UPDATE wallet_players SET balance = balance - " + price + " WHERE player = '" + player + "';", true);
+									List<String> commands = plugin.getConfig().getStringList("packages." + purchasedPack + ".commands");
+									for (String cmd : commands) {
+										plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), cmd.replace("%player", player));
+									}
+									s.sendMessage("§aWe are adding §3" + purchasedPack + "§a to your account.");
+									s.sendMessage("§aSubtacted §3" + price + "§a from your account.");
+									s.sendMessage("§aPurchase successfully executed!");
+								}
 							}
-						}
-					} catch (SQLException e) {
-						e.printStackTrace();
+						} catch (SQLException e) {
+							e.printStackTrace();
 
-					} 
+						} 
+					}
 
 				} else {
 					s.sendMessage("Something went wrong");
