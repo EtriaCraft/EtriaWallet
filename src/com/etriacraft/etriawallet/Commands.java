@@ -96,18 +96,22 @@ public class Commands {
 					s.sendMessage("§3/packs info <name>§f - Returns information on a pack.");
 					return true;
 				} else if (args[0].equalsIgnoreCase("info") && s.hasPermission("etriawallet.packs.info")) {
-					String pack = args[1];
-					Double price = plugin.getConfig().getDouble("packages." + pack + ".price");
-					if (price == null) {
-						s.sendMessage("§cWas not able to pull the required information for this package.");
-						s.sendMessage("§cPerhaps it doesn't exist?");
+					if (args.length == 1) {
+						s.sendMessage("§cNot enough arguments, please provide a package name!");
 					} else {
-						String description = plugin.getConfig().getString("packages." + pack + ".description");
-						s.sendMessage("-----§e" + pack + " Info§f----- ");
-						s.sendMessage("§aPackage Name:§3 " + pack);
-						s.sendMessage("§aPrice:§3 " + price);
-						s.sendMessage("§aDescription:§3 " + description);
-						return true;
+						String pack = args[1];
+						Double price = plugin.getConfig().getDouble("packages." + pack + ".price");
+						if (price == null) {
+							s.sendMessage("§cWas not able to pull the required information for this package.");
+							s.sendMessage("§cPerhaps it doesn't exist?");
+						} else {
+							String description = plugin.getConfig().getString("packages." + pack + ".description");
+							s.sendMessage("-----§e" + pack + " Info§f----- ");
+							s.sendMessage("§aPackage Name:§3 " + pack);
+							s.sendMessage("§aPrice:§3 " + price);
+							s.sendMessage("§aDescription:§3 " + description);
+							return true;
+						}
 					}
 				} else if (args[0].equalsIgnoreCase("buy") && s.hasPermission("etriawallet.packs.buy")) {
 					String purchasedPack = args[1];
