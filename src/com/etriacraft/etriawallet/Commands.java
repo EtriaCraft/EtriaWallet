@@ -8,7 +8,6 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
-import org.bukkit.entity.Player;
 
 public class Commands {
 
@@ -29,17 +28,30 @@ public class Commands {
 			public boolean onCommand(CommandSender s, Command c, String label, String[] args) {
 				if (args.length < 1) {
 					s.sendMessage("§eEtriaWallet Commands");
-					s.sendMessage("§3/wallet create <player>§f - Creates a wallet for your account.");
-					s.sendMessage("§3/wallet balance§f - Shows your balance.");
-					s.sendMessage("§3/wallet give <player> <amount>§f - Gives a player money.");
+					if (s.hasPermission ("etriawallet.create")) {
+						s.sendMessage("§3/wallet create <player>§f - Creates a wallet for your account.");
+					} if (s.hasPermission("wallet.balance")) {
+						s.sendMessage("§3/wallet balance§f - Shows your balance.");
+					} if (s.hasPermission("etriawallet.give")) {
+						s.sendMessage("§3/wallet give <player> <amount>§f - Gives a player money.");
+					} if (s.hasPermission("etriawallet.take")) {
+						s.sendMessage("§3/wallet take <player> <amount>§f - Takes money from a player.");
+					} if (s.hasPermission("etriawallet.reload")); {
+						s.sendMessage("§3/wallet reload§f - Reloads Configs / Packages.");
+					} if (s.hasPermission("etriawallet.packs")); {
+						s.sendMessage("§3/packs§f - Lists the pack commands.");
+					}
 					return true;
+				} else if (args[0].equalsIgnoreCase("reload") && s.hasPermission("etriawallet.reload")) {
+					plugin.reloadConfig();
+					s.sendMessage("§aConfig / Packages reloaded.");
 				}
 				else if (args[0].equalsIgnoreCase("balance") && s.hasPermission("etriawallet.balance")) {
 					if (args.length == 1) {
 						ResultSet rs2 = DBConnection.query("SELECT balance FROM wallet_players WHERE player = '" + s.getName() + "';", false);
 						try {
 							while (rs2.next()) {
-								s.sendMessage("§eYou currently have a balance of §a$" + rs2.getDouble("balance") + ".");
+								s.sendMessage("§eYou currently have a balance of §a$" + rs2.getDouble("balance") + "0§e.");
 							}
 						} catch (SQLException e) {
 							s.sendMessage("§cWas unable to check the balance. Perhaps you don't have a wallet yet.");
@@ -70,7 +82,7 @@ public class Commands {
 					s.sendMessage("§eYou have given " + args[1] + " §a$" + args[2] + "§e.");
 				} else if (args[0].equalsIgnoreCase("take") && args.length == 3 && s.hasPermission("etriawallet.take")) {
 					DBConnection.query("UPDATE wallet_players SET balance = balance - " + args[2] + " WHERE player = '" + args[1] + "';", true);
-					s.sendMessage("§eYou have taken " + args[1] + "§a$" + args[2] + "§e.");
+					s.sendMessage("§eYou have taken §a$ " + args[2] + "§e from §a" + args[1] + "§e.");
 				} else { 
 					s.sendMessage("§cYou don't have permission to do that!");
 				} return true;
