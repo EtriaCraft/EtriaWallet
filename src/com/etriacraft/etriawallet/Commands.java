@@ -30,7 +30,7 @@ public class Commands {
 					s.sendMessage("§eEtriaWallet Commands");
 					if (s.hasPermission ("etriawallet.create")) {
 						s.sendMessage("§3/wallet create <player>§f - Creates a wallet for your account.");
-					} if (s.hasPermission("wallet.balance")) {
+					} if (s.hasPermission("etriawallet.balance")) {
 						s.sendMessage("§3/wallet balance§f - Shows your balance.");
 					} if (s.hasPermission("etriawallet.give")) {
 						s.sendMessage("§3/wallet give <player> <amount>§f - Gives a player money.");
@@ -62,7 +62,7 @@ public class Commands {
 						ResultSet rs2 = DBConnection.query("SELECT balance FROM wallet_players WHERE player = '" + args[1] + "';", false);
 						try {
 							while (rs2.next()) {
-								s.sendMessage("§e" + args[1] + " has a balance of §a" + rs2.getDouble("balance") + "§e.");
+								s.sendMessage("§e" + args[1] + " has a balance of §a" + rs2.getDouble("balance") + "0§e.");
 							}
 						} catch (SQLException e) {
 							s.sendMessage("§cWas unable to find the balance for §e" + args[1] + " §cperhaps that player doesn't have a wallet?");
@@ -70,15 +70,15 @@ public class Commands {
 						}
 					}
 				} else if (args[0].equalsIgnoreCase("create") && s.hasPermission("etriawallet.create")) {
-					if (args.length == 1) {
+					if (args.length == 1) {	
 						DBConnection.query("INSERT INTO wallet_players(player, balance) VALUES ('" + s.getName() + "', 0.00)", true);
-						s.sendMessage("§eWallet Created!");
-					} else if (args.length == 2 && s.hasPermission("etriawallet.create.others")) {
-						DBConnection.query("INSERT INTO wallet_players(player, balance) VALUES ('" + args[1] + "', 0.00)", true);
-						s.sendMessage("§eWallet created for " + args[1] + ".");
 					}
+				} else if (args.length == 2 && s.hasPermission("etriawallet.create.others")) {
+					DBConnection.query("INSERT INTO wallet_players(player, balance) VALUES ('" + args[1] + "', 0.00)", true);
+					s.sendMessage("§eWallet created for " + args[1] + ".");
+
 				} else if (args[0].equalsIgnoreCase("give") && args.length == 3 && s.hasPermission("etriawallet.give")) {
-					DBConnection.query("UPDATE wallet_players SET balance = balance + " + args[2] + " WHERE player = '" + args[1] + "';", true);
+					ResultSet rs2 = DBConnection.query("UPDATE wallet_players SET balance = balance + " + args[2] + " WHERE player = '" + args[1] + "';", true);
 					s.sendMessage("§eYou have given " + args[1] + " §a$" + args[2] + "§e.");
 				} else if (args[0].equalsIgnoreCase("take") && args.length == 3 && s.hasPermission("etriawallet.take")) {
 					DBConnection.query("UPDATE wallet_players SET balance = balance - " + args[2] + " WHERE player = '" + args[1] + "';", true);
@@ -93,7 +93,12 @@ public class Commands {
 			public boolean onCommand(CommandSender s, Command c, String label, String[] args) {
 				if (args.length < 1) {
 					s.sendMessage("§eApplicable Pack Commands");
+					if (s.hasPermission("etriawallet.packs.info")) {
 					s.sendMessage("§3/packs info <name>§f - Returns information on a pack.");
+					}
+					if (s.hasPermission("etriawallet.packs.buy")) {
+						s.sendMessage("§3/packs buy <name>§f - Buys a package.");
+					}
 					return true;
 				} else if (args[0].equalsIgnoreCase("info") && s.hasPermission("etriawallet.packs.info")) {
 					if (args.length == 1) {
@@ -108,7 +113,7 @@ public class Commands {
 							String description = plugin.getConfig().getString("packages." + pack + ".description");
 							s.sendMessage("-----§e" + pack + " Info§f----- ");
 							s.sendMessage("§aPackage Name:§3 " + pack);
-							s.sendMessage("§aPrice:§3 " + price);
+							s.sendMessage("§aPrice:§3 " + price + "0");
 							s.sendMessage("§aDescription:§3 " + description);
 							return true;
 						}
@@ -137,16 +142,14 @@ public class Commands {
 										plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), cmd.replace("%player", player));
 									}
 									s.sendMessage("§aWe are adding §3" + purchasedPack + "§a to your account.");
-									s.sendMessage("§aSubtacted §3" + price + "§a from your account.");
+									s.sendMessage("§aSubtracted §3" + price + "0§a from your account.");
 									s.sendMessage("§aPurchase successfully executed!");
 								}
 							}
 						} catch (SQLException e) {
 							e.printStackTrace();
-
-						} 
+						}
 					}
-
 				} else {
 					s.sendMessage("Something went wrong");
 				} return true;

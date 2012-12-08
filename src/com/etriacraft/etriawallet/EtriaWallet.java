@@ -5,9 +5,13 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.sql.ResultSet;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.configuration.file.FileConfiguration;
@@ -103,6 +107,23 @@ public class EtriaWallet extends JavaPlugin {
 		DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date date = new Date();
 		return dateFormat.format(date);
+	}
+	
+	public String getExpiresDate(String packagename) {
+		Integer days = getConfig().getInt("packages." + packagename + ".expires");
+		if (!(days == 0)) {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			Calendar c = Calendar.getInstance();
+			try {
+				c.setTime(sdf.parse(getCurrentDate()));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			c.add(Calendar.DATE, days);
+			String exp = sdf.format(c.getTime());
+			return exp;
+		}
+		return null;
 	}
 	
 }
