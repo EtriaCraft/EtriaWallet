@@ -8,6 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.PluginCommand;
+import org.bukkit.entity.Player;
 
 public class Commands {
 
@@ -26,6 +27,7 @@ public class Commands {
 		exe = new CommandExecutor() {
 			@Override
 			public boolean onCommand(CommandSender s, Command c, String label, String[] args) {
+				// This will only send the player the commands they have permission to use.
 				if (args.length < 1) {
 					s.sendMessage("§eEtriaWallet Commands");
 					if (s.hasPermission ("etriawallet.create")) {
@@ -43,6 +45,7 @@ public class Commands {
 					}
 					return true;
 				} else if (args[0].equalsIgnoreCase("reload") && s.hasPermission("etriawallet.reload")) {
+					// If the command is "/wallet reload" then it will reload the Configuration File.
 					plugin.reloadConfig();
 					s.sendMessage("§aConfig / Packages reloaded.");
 				}
@@ -50,31 +53,70 @@ public class Commands {
 					if (args.length == 1) {
 						ResultSet rs2 = DBConnection.query("SELECT balance FROM wallet_players WHERE player = '" + s.getName() + "';", false);
 						try {
-							while (rs2.next()) {
-								s.sendMessage("§eYou currently have a balance of §a$" + rs2.getDouble("balance") + "0§e.");
+							// If a balance can be returned, show it to the player.
+							if (rs2.next()) {
+								do {
+									s.sendMessage("§eYou currently have a balance of §a$" + rs2.getDouble("balance") + "0§e credits.");
+								} while(rs2.next());
+							} else if (!rs2.next()) {
+								// If we can't find the player's balance, tell them to create one.
+								s.sendMessage("§cWas not able to find your wallet information!");
+								s.sendMessage("§cTry creating one using the command: §3/wallet create");
 							}
 						} catch (SQLException e) {
-							s.sendMessage("§cWas unable to check the balance. Perhaps you don't have a wallet yet.");
-							s.sendMessage("§eUse §3/wallet create §eto create a wallet for yourself.");
 							e.printStackTrace();
 						}
 					} else if (args.length == 2 && s.hasPermission("etriawallet.balance.others")) {
 						ResultSet rs2 = DBConnection.query("SELECT balance FROM wallet_players WHERE player = '" + args[1] + "';", false);
 						try {
-							while (rs2.next()) {
-								s.sendMessage("§e" + args[1] + " has a balance of §a" + rs2.getDouble("balance") + "0§e.");
+							if (rs2.next()) {
+								do {
+									// If the player's balance can be returned, display it.
+									s.sendMessage("§e" + args[1] + " has §a" + rs2.getDouble("balance") + "0§e credits.");
+								} while (rs2.next());
+								// If no balance can be found, tell the player.
+							} else if (!rs2.next()) {
+								s.sendMessage("§cWas not able to find wallet information for §3" + args[1]);
 							}
 						} catch (SQLException e) {
-							s.sendMessage("§cWas unable to find the balance for §e" + args[1] + " §cperhaps that player doesn't have a wallet?");
 							e.printStackTrace();
 						}
 					}
 				} else if (args[0].equalsIgnoreCase("create") && s.hasPermission("etriawallet.create")) {
 					if (args.length == 1) {	
-						DBConnection.query("INSERT INTO wallet_players(player, balance) VALUES ('" + s.getName() + "', 0.00)", true);
+						ResultSet rs2 = DBConnection.query("SELECT player FROM wallet_players WHERE player = '" + s.getName() + "';", false);
+						try {
+							if (rs2.next()) {
+								do {
+									// If the query returns something, the player already has a wallet, don't attempt creating a new one!
+									s.sendMessage("§cIt appears you already have a wallet, we can't let you create another one!");
+								} while (rs2.next());
+								// If the balance can't be found, try creating the wallet.
+							}else if (!rs2.next()) {
+								DBConnection.query("INSERT INTO wallet_players(player, balance) VALUES ('" + s.getName() + "', 0.00)", true);
+								s.sendMessage("§aYour wallet has been created!");
+							}
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
+						//						DBConnection.query("INSERT INTO wallet_players(player, balance) VALUES ('" + s.getName() + "', 0.00)", true);
+						//						s.sendMessage("§aYour wallet has been created!");
+					} if (args.length == 2 && s.hasPermission("etriawallet.create.others")) {
+						ResultSet rs2 = DBConnection.query("SELECT player FROM wallet_players WHERE player = '" + args[1] + "';", false);
+						try {
+							if (rs2.next()) {
+								// If the player already has a wallet, skip the creation process.
+								do {
+									s.sendMessage("§3" + args[1] + " §calready has a wallet. Creating a new one would be silly.");
+								} while (rs2.next());
+							} else if (!rs2.next()) {
+								DBConnection.query("INSERT INTO wallet_players(player, balance) VALUES ('" + args[1] + "', 0.00)", true);
+								s.sendMessage("§eCreated a new wallet for §3" + args[1] + "§e.");
+							}
+						} catch (SQLException e) {
+							e.printStackTrace();
+						}
 					}
-				} else if (args.length == 2 && s.hasPermission("etriawallet.create.others")) {
-					DBConnection.query("INSERT INTO wallet_players(player, balance) VALUES ('" + args[1] + "', 0.00)", true);
 					s.sendMessage("§eWallet created for " + args[1] + ".");
 
 				} else if (args[0].equalsIgnoreCase("give") && args.length == 3 && s.hasPermission("etriawallet.give")) {
@@ -94,7 +136,7 @@ public class Commands {
 				if (args.length < 1) {
 					s.sendMessage("§eApplicable Pack Commands");
 					if (s.hasPermission("etriawallet.packs.info")) {
-					s.sendMessage("§3/packs info <name>§f - Returns information on a pack.");
+						s.sendMessage("§3/packs info <name>§f - Returns information on a pack.");
 					}
 					if (s.hasPermission("etriawallet.packs.buy")) {
 						s.sendMessage("§3/packs buy <name>§f - Buys a package.");
