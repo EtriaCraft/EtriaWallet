@@ -5,27 +5,31 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.sql.ResultSet;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 import java.util.logging.Logger;
 
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public class EtriaWallet extends JavaPlugin {
 	
 	protected static Logger log;
 	
+	// Configs
 	File configFile;
 	FileConfiguration config;
 	
+	// Commands
 	Commands cmd;
+	
+	// Events
+	private final BlockListener blockListener = new BlockListener(this);
 	
 	@Override
 	public void onEnable() {
@@ -47,6 +51,11 @@ public class EtriaWallet extends JavaPlugin {
 		config = new YamlConfiguration();
 		loadYamls();
 		
+		// Events
+		PluginManager pm = getServer().getPluginManager();
+		pm.registerEvents(blockListener, this);
+		
+		// Database Variables
 		DBConnection.host = config.getString("MySQL.host", "localhost");
 		DBConnection.db = config.getString("MySQL.database", "minecraft");
 		DBConnection.user = config.getString("MySQL.username", "root");
